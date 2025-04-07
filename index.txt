@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interfaccia Interattiva</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background: #f9f9f9;
+            color: #333;
+        }
+
+        h1 {
+            color: #444;
+            margin-bottom: 30px;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        button, select, input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        #hover {
+            width: 250px;
+            height: 70px;
+            background-color: black;
+            color: white;
+            line-height: 70px;
+            margin: 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(9, 40px);
+            grid-template-rows: repeat(9, 40px);
+            gap: 2px;
+            width: fit-content;
+            margin: 0 auto;
+        }
+
+        .cell {
+            width: 40px;
+            height: 40px;
+            background-color: lightgray;
+            border: 1px solid #999;
+            box-sizing: border-box;
+        }
+
+        .redSquare {
+            background-color: red !important;
+        }
+
+        .error {
+            border: 2px solid red !important;
+        }
+
+        ul#suggestions {
+            margin-top: 0;
+            width: 200px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: left;
+        }
+
+        ul#suggestions li {
+            background: #fff;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+
+        ul#suggestions li:hover {
+            background: #eee;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Esercizi sugli Eventi</h1>
+
+    <div class="container">
+        <button id="doppioClick">Clicca o fai Doppio Click!</button>
+        <div id="hover">Passa sopra con il mouse</div>
+        <input type="text" id="specialText" placeholder="Scrivi una parola speciale">
+        <select id="colorSelect">
+            <option value="red">Rosso</option>
+            <option value="green">Verde</option>
+            <option value="blue">Blu</option>
+            <option value="purple">Viola</option>
+            <option value="orange">Arancione</option>
+        </select>
+        <input type="text" id="borderInput" placeholder="Focus test">
+        <input type="text" id="autocompleteInput" placeholder="Digita una parola...">
+    </div>
+
+    <ul id="suggestions"></ul>
+    <div id="grid"></div>
+
+    <script>
+        document.getElementById("doppioClick").addEventListener("dblclick", function () {
+            alert("Doppio Click!");
+        });
+
+        const hoverDiv = document.getElementById("hover");
+        hoverDiv.addEventListener("mouseenter", function () {
+            hoverDiv.style.backgroundColor = "yellow";
+            hoverDiv.style.color = "green";
+        });
+        hoverDiv.addEventListener("mouseleave", function () {
+            hoverDiv.style.backgroundColor = "black";
+            hoverDiv.style.color = "white";
+        });
+
+        let specialTextValue = "";
+        document.getElementById("specialText").addEventListener("input", function(e) {
+            specialTextValue = e.target.value.toLowerCase();
+        });
+
+        document.body.addEventListener("click", function() {
+            if (specialTextValue === "blu") {
+                document.body.style.backgroundColor = "#87CEEB"; // celeste
+            } else {
+                document.body.style.backgroundColor = "#f9f9f9";
+            }
+        });
+
+        const colorSelect = document.getElementById("colorSelect");
+        const title = document.querySelector("h1");
+        colorSelect.addEventListener("change", function() {
+            title.style.color = this.value;
+        });
+
+        const borderInput = document.getElementById("borderInput");
+        borderInput.addEventListener("focus", function() {
+            borderInput.style.border = "2px solid blue";
+        });
+        borderInput.addEventListener("blur", function() {
+            if (!borderInput.value) {
+                borderInput.classList.add("error");
+                alert("Il campo non può essere vuoto!");
+            } else {
+                borderInput.classList.remove("error");
+            }
+        });
+
+        const grid = document.getElementById("grid");
+        let x = 0, y = 0;
+
+        for (let i = 0; i < 81; i++) {
+            const cell = document.createElement("div");
+            cell.classList.add("cell");
+            grid.appendChild(cell);
+        }
+
+        function updateGrid() {
+            document.querySelectorAll(".cell").forEach(cell => cell.classList.remove("redSquare"));
+            grid.children[y * 9 + x].classList.add("redSquare");
+        }
+        updateGrid();
+
+        document.addEventListener("keydown", function(e) {
+            if (e.key === "ArrowUp" && y > 0) y--;
+            if (e.key === "ArrowDown" && y < 8) y++;
+            if (e.key === "ArrowLeft" && x > 0) x--;
+            if (e.key === "ArrowRight" && x < 8) x++;
+            updateGrid();
+        });
+
+        const words = ["gatto","gallo", "cane", "cavallo", "elefante", "leone"];
+        const autocompleteInput = document.getElementById("autocompleteInput");
+        const suggestions = document.getElementById("suggestions");
+
+        autocompleteInput.addEventListener("input", function() {
+            suggestions.innerHTML = "";
+            const value = this.value.toLowerCase();
+            if (!value) return;
+
+            words.filter(word => word.startsWith(value)).forEach(word => {
+                const li = document.createElement("li");
+                li.textContent = word;
+                li.addEventListener("click", function() {
+                    autocompleteInput.value = word;
+                    suggestions.innerHTML = "";
+                });
+                suggestions.appendChild(li);
+            });
+        });
+    </script>
+</body>
+
+</html>
